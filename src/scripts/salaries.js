@@ -28,12 +28,21 @@ function ready(json) {
   const states = topojson.feature(json, json.objects.salaries)
   console.log(json)
 
+
+  svg
+  .append('text')
+  .attr('class', 'source')
+  .text("Source : National Education Association")
+  .attr("x", 3)
+  .attr('y', height+margin.bottom -2)
+  .style("font-size", 9)
+
   const formatComma = d3.format(',')
   const tip = d3
     .tip()
     .attr('class', 'd3-tip')
     .style('position', 'fixed')
-    .offset([10, 30])
+    .offset([10, 10])
     .html(function(d) {
       return `<b>${
         d.properties.NAME
@@ -43,6 +52,9 @@ function ready(json) {
 
   projection.fitSize([width, height], states)
 
+
+
+  
   svg
     .selectAll('path')
     .data(states.features)
@@ -197,6 +209,7 @@ function ready(json) {
           .attr('stroke', 'none')
       })
   })
+
   // // ---------------------------------------------------------------------------------
 
   d3.select('#above-indiana-step').on('stepin', function() {
@@ -231,6 +244,8 @@ function ready(json) {
 
     svg.call(tip)
   })
+
+
   // -------------------------------------------------------
 
   function render() {
