@@ -120,7 +120,12 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 })({"data/total-salaries.csv":[function(require,module,exports) {
 module.exports = "/total-salaries.a36f57cf.csv";
 },{}],"scripts/salaries-dropdown.js":[function(require,module,exports) {
-var stateFields = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'DC', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montan', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'];
+var stateFields = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'DC', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'];
+
+function Y0() {
+  return yScale(0);
+}
+
 d3.csv(require('/data/total-salaries.csv'), function (error, data) {
   var salaryMap = {};
   data.forEach(function (d) {
@@ -146,15 +151,20 @@ var makeVis = function makeVis(salaryMap) {
 
   var xScale = d3.scale.ordinal().domain(stateFields).rangeRoundBands([0, width], 0.1); // Make y scale, the domain will be defined on bar update
 
-  var yScale = d3.scale.linear().domain([-25, 25]).range([height, 0]); // Create canvas
+  var yScale = d3.scale.linear().domain([-20, 30]).range([height, 0]); // Create canvas
 
   var canvas = d3.select("#vis-container").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")"); // Make x-axis and add to canvas
 
   var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
-  canvas.append("g").attr("class", "x axis").attr("transform", "translate(0," + height / 2 + ")").call(xAxis); // Make y-axis and add to canvas
+  canvas.append("g").attr("class", "x axis").attr("transform", "translate(0," + yScale(0) + ")").call(xAxis).selectAll("text").style("text-anchor", "end").style("alignment-baseline", 'start').style("font-size", 9).attr("dx", "-.8em").attr("dy", function (d) {
+    return d < 0 ? 7 : -7;
+  }).attr("transform", "rotate(-90)"); // Make y-axis and add to canvas
 
   var yAxis = d3.svg.axis().scale(yScale).orient("left");
-  var yAxisHandleForUpdate = canvas.append("g").attr("class", "y axis").call(yAxis);
+  var yAxisHandleForUpdate = canvas.append("g").attr("class", "y axis").call(yAxis).selectAll("text").style("text-anchor", "end").style("alignment-baseline", 'start').style("font-size", 10); // .attr("dx", "-.8em")
+  // .attr("dy", function(d) { return d < 0 ? 7:-7})
+  // .attr("transform", "rotate(-90)");
+
   yAxisHandleForUpdate.append("text").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", ".71em").style("text-anchor", "end").style("font-size", 10).text("Percent change");
 
   var updateBars = function updateBars(data) {
@@ -164,15 +174,15 @@ var makeVis = function makeVis(salaryMap) {
     bars.enter().append("rect").attr("class", "bar").attr("x", function (d, i) {
       return xScale(stateFields[i]);
     }).attr("width", xScale.rangeBand()).attr("y", function (d, i) {
-      return yScale(d);
+      return d < 0 ? yScale(0) : yScale(d);
     }).attr("height", function (d, i) {
-      return height - yScale(d);
+      return Math.abs(yScale(d) - yScale(0));
     }); // Update old ones, already have x / width from before
 
     bars.transition().duration(250).attr("y", function (d, i) {
-      return yScale(d);
+      return d < 0 ? yScale(0) : yScale(d);
     }).attr("height", function (d, i) {
-      return height / 2 - yScale(d);
+      return Math.abs(yScale(d) - yScale(0));
     }); // Remove old ones
 
     bars.exit().remove();

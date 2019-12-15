@@ -24,7 +24,7 @@ var stateFields = ['Alabama',
 'Minnesota',
 'Mississippi',
 'Missouri',
-'Montan',
+'Montana',
 'Nebraska',
 'Nevada',
 'New Hampshire',
@@ -49,6 +49,10 @@ var stateFields = ['Alabama',
 'West Virginia',
 'Wisconsin',
 'Wyoming'];
+
+function Y0() {
+    return yScale(0);
+  }
 
 
 d3.csv(require('/data/total-salaries.csv'), function(error, data) {
@@ -78,7 +82,7 @@ var makeVis = function(salaryMap) {
 
     // Make y scale, the domain will be defined on bar update
     var yScale = d3.scale.linear()
-        .domain([-25, 25])
+        .domain([-20, 30])
         .range([height, 0]);
 
     // Create canvas
@@ -96,8 +100,15 @@ var makeVis = function(salaryMap) {
 
     canvas.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + height/2 + ")")
-        .call(xAxis);
+        .attr("transform", "translate(0," + yScale(0) + ")")
+        .call(xAxis)
+        .selectAll("text")	
+        .style("text-anchor", "end")
+        .style("alignment-baseline", 'start')
+        .style("font-size", 9)
+        .attr("dx", "-.8em")
+        .attr("dy", function(d) { return d < 0 ? 7:-7})
+        .attr("transform", "rotate(-90)");
 
     // Make y-axis and add to canvas
     var yAxis = d3.svg.axis()
@@ -106,7 +117,14 @@ var makeVis = function(salaryMap) {
 
     var yAxisHandleForUpdate = canvas.append("g")
         .attr("class", "y axis")
-        .call(yAxis);
+        .call(yAxis)
+        .selectAll("text")	
+        .style("text-anchor", "end")
+        .style("alignment-baseline", 'start')
+        .style("font-size", 10);
+        // .attr("dx", "-.8em")
+        // .attr("dy", function(d) { return d < 0 ? 7:-7})
+        // .attr("transform", "rotate(-90)");
 
     yAxisHandleForUpdate.append("text")
         .attr("transform", "rotate(-90)")
@@ -128,15 +146,15 @@ var makeVis = function(salaryMap) {
             .attr("class", "bar")
             .attr("x", function(d,i) { return xScale( stateFields[i] ); })
             .attr("width", xScale.rangeBand())
-            .attr("y", function(d,i) { return yScale(d); })
-            .attr("height", function(d,i) { return height - yScale(d); });
+            .attr("y", function(d, i) { return d < 0 ? yScale(0) : yScale(d); })
+            .attr("height", function(d, i) { return Math.abs( yScale(d) - yScale(0) ); });
        
 
         // Update old ones, already have x / width from before
         bars
             .transition().duration(250)
-            .attr("y", function(d,i) { return yScale(d); })
-            .attr("height", function(d,i) { return height/2 - yScale(d); });
+            .attr("y", function(d, i) { return d < 0 ? yScale(0) : yScale(d); })
+            .attr("height", function(d, i) { return Math.abs( yScale(d) - yScale(0) ); });
 
         // Remove old ones
         bars.exit().remove();

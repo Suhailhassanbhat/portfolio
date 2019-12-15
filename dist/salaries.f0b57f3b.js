@@ -36349,7 +36349,7 @@ function ready(json) {
   console.log(json);
   svg.append('text').attr('class', 'source').text("Source : National Education Association").attr("x", 3).attr('y', height + margin.bottom - 2).style("font-size", 9);
   var formatComma = d3.format(',');
-  var tip = d3.tip().attr('class', 'd3-tip').style('position', 'fixed').offset([10, 10]).html(function (d) {
+  var tip = d3.tip().attr('class', 'd3-tip').style('position', 'absolute').offset([10, 10]).html(function (d) {
     return "<b>".concat(d.properties.NAME, "</b> <br>  <b>Starting Salary:</b> <span style='color:red'>$").concat(formatComma(d.properties.teacher_sa), "</span>");
   });
   svg.call(tip);
