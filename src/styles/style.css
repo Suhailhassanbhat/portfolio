@@ -79,12 +79,24 @@ h1.headline {
     font-weight: 800;
 }
 
+.headline-text {
+    margin-bottom: 1.1rem;
+    margin-top:1rem;
+    text-align:center;
+}
+
 h2.subhead {
     font-size: 1.4rem;
     line-height: 2rem;
     margin-bottom:0;
     margin-top: 15px;
     font-weight: 400;
+}
+
+.subhead-text {
+    margin-bottom:1rem;
+    text-align:center;
+    max-width:700px;
 }
 
 p.body-text {
